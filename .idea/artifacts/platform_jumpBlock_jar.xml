@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="platform-jumpBlock:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/platform_jumpBlock_jar</output-path>
+    <root id="archive" name="platform-jumpBlock.jar">
+      <element id="module-output" name="platform-jumpBlock" />
+    </root>
+  </artifact>
+</component>

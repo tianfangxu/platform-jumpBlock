@@ -1,5 +1,7 @@
 package com.tfx.model;
 
+import com.tfx.interfaces.DieNoticeHandle;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -22,6 +24,9 @@ public class Master extends JPanel {
 
     volatile int y;
 
+    KeyListener keyListener;
+    DieNoticeHandle dieNoticeHandle;
+
     public Master() {
         super(null);
     }
@@ -38,10 +43,11 @@ public class Master extends JPanel {
         super(isDoubleBuffered);
     }
 
-    public static Master getInstance(int x,int y){
+    public static Master getInstance(int x, int y, DieNoticeHandle handle){
         Master master = new Master();
         master.x = x;
         master.y = y;
+        master.dieNoticeHandle = handle;
         master.setLocation(x,y);
         return master;
     }
@@ -61,6 +67,10 @@ public class Master extends JPanel {
     public void setLocationX(int x) {
         this.x = x;
         super.setLocation(x, y);
+        System.out.println(x);
+        if (this.x > 800){
+            die();
+        }
     }
     
     public void setLocationY(int y) {
@@ -73,11 +83,15 @@ public class Master extends JPanel {
     public volatile boolean keepjumpFlag = false;
 
     public KeyListener keyAction(){
-        return new KeyListener() {
+        if (keyListener != null){
+            return keyListener;
+        }
+        keyListener =  new KeyListener() {
             @Override// 当按下并释放键时调用
             public void keyTyped(KeyEvent e) {}
             @Override// 当释放键时调用
             public void keyReleased(KeyEvent e) {
+                System.out.println(1);
                 int keyCode = e.getKeyCode();
                 if (keyCode == RIGHT_KEY){
                     keepRightMoveFlag = false;
@@ -89,6 +103,7 @@ public class Master extends JPanel {
             }
             @Override// 当按下键时调用
             public void keyPressed(KeyEvent e) {
+                System.out.println(2);
                 int keyCode = e.getKeyCode();
                 if (keyCode == RIGHT_KEY){
                     keepRightMoveFlag = true;
@@ -104,6 +119,7 @@ public class Master extends JPanel {
                 }
             }
         };
+        return keyListener;
     }
 
     public volatile boolean jumpFlag = false;
@@ -193,6 +209,34 @@ public class Master extends JPanel {
                     this.setLocationX(Math.max((this.getX()+(target/step)),0));
                     this.repaint();
                     Thread.sleep(moveStep/step);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+    
+    public void die(){
+        keepLeftMoveFlag = false;
+        keepRightMoveFlag = false;
+        keepjumpFlag = false;
+        jumpTransferExecutor.submit(()->{
+            try {
+                for (int i = 0; i < 4; i++) {
+                    this.setLocationY(this.getY() - getDistance((3 - i)));
+                    this.repaint();
+                    Thread.sleep(100);
+                }
+                for (int i = 0; i < 10; i++) {
+                    this.setLocationY(this.getY() + getDistance((i + 1)));
+                    this.repaint();
+                    Thread.sleep(40);
+                }
+                Container parent = this.getParent();
+                parent.remove(this);
+                parent.repaint();
+                if (dieNoticeHandle != null){
+                    dieNoticeHandle.notice(this);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.tfx.jumpBlock</id>
   <name>jumpBlock</name>
-  <version>1.0</version>
+  <version>1.01</version>
   <vendor email="tianfx1128@gmail.com" url="tianfx1128@gmail.com">jumpBlock</vendor>
 
   <description><![CDATA[
@@ -12,6 +12,7 @@
 
   <change-notes><![CDATA[
       v1.0 Created a block that can move forward and backward, as well as jump.<br>
+      v1.01 Increase regional boundaries and methods of death, restart.<br>
     ]]>
   </change-notes>
 
