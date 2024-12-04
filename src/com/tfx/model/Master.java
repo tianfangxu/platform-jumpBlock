@@ -67,7 +67,6 @@ public class Master extends JPanel {
     public void setLocationX(int x) {
         this.x = x;
         super.setLocation(x, y);
-        System.out.println(x);
         if (this.x > 800){
             die();
         }
