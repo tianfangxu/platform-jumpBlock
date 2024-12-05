@@ -30,11 +30,11 @@ public class MainUI  implements ToolWindowFactory, DumbAware , DieNoticeHandle {
             Content explainContent = toolWindow.getContentManager().getFactory().createContent(explain, EXPLAIN, false);
             toolWindow.getContentManager().addContent(explainContent);
             
-            JComponent jComponent1 = Mapper.getInstance().getMap(JBColor.YELLOW);
+            JComponent jComponent1 = Subject.getInstance().getProject(JBColor.YELLOW);
             Content content1 = toolWindow.getContentManager().getFactory().createContent(jComponent1, TABTITLE1, false);
             toolWindow.getContentManager().addContent(content1);
 
-            JComponent jComponent2 = Mapper.getInstance().getMap(JBColor.GREEN);
+            JComponent jComponent2 = Subject.getInstance().getProject(JBColor.GREEN);
             Content content2 = toolWindow.getContentManager().getFactory().createContent(jComponent2, TABTITLE2, false);
             toolWindow.getContentManager().addContent(content2);
         } catch (Exception e) {
@@ -44,7 +44,7 @@ public class MainUI  implements ToolWindowFactory, DumbAware , DieNoticeHandle {
 
     private JComponent getExplainText() {
         JBPanel panel = new JBPanel(null);
-        JBLabel label = new JBLabel("键位说明：方向键操作（ ← 左移动 ,↑ 跳跃,→ 右移动 ），点击上边的 tab 开始吧");
+        JBLabel label = new JBLabel("键位说明：方向键移动（ ← 左移动 ,↑ 跳跃,→ 右移动 ），双击或长按会加速移动，点击上边的 tab 开始吧");
         label.setLocation(0,0);
         label.setSize(1000,30);
         panel.add(label);
@@ -54,7 +54,7 @@ public class MainUI  implements ToolWindowFactory, DumbAware , DieNoticeHandle {
     public static void main(String[] args) {
         JFrame jf = new JFrame("jumpBlock");
         jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        jf.setContentPane(Mapper.getInstance().getMap(JBColor.YELLOW));
+        jf.setContentPane(Subject.getInstance().getProject(JBColor.YELLOW));
         jf.pack();
         jf.setLocationRelativeTo(null);
         jf.setVisible(true);

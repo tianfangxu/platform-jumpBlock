@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,28 +20,22 @@ public class Master extends JPanel {
     public static int RIGHT_KEY = 39;
     public static int JUMP_KEY = 38;
     
+    public static int WIDTH = 30;
+    public static int HEIGHT = 30;
+    
 
     volatile int x;
-
     volatile int y;
-
     KeyListener keyListener;
     DieNoticeHandle dieNoticeHandle;
+    List<Region> regions;
+
+    public void setRegions(List<Region> regions) {
+        this.regions = regions;
+    }
 
     public Master() {
         super(null);
-    }
-
-    public Master(LayoutManager layout, boolean isDoubleBuffered) {
-        super(layout, isDoubleBuffered);
-    }
-
-    public Master(LayoutManager layout) {
-        super(layout);
-    }
-    
-    public Master(boolean isDoubleBuffered) {
-        super(isDoubleBuffered);
     }
 
     public static Master getInstance(int x, int y, DieNoticeHandle handle){
@@ -49,27 +44,15 @@ public class Master extends JPanel {
         master.y = y;
         master.dieNoticeHandle = handle;
         master.setLocation(x,y);
+        master.setSize(WIDTH,HEIGHT);
         return master;
     }
 
-    
-    @Override
-    public int getX() {
-        return x;
-    }
-
-
-    @Override
-    public int getY() {
-        return y;
-    }
-
     public void setLocationX(int x) {
+        x = Math.max(x, 0);
         this.x = x;
         super.setLocation(x, y);
-        if (this.x > 800){
-            die();
-        }
+        
     }
     
     public void setLocationY(int y) {
@@ -80,17 +63,23 @@ public class Master extends JPanel {
     public volatile boolean keepLeftMoveFlag = false;
     public volatile boolean keepRightMoveFlag = false;
     public volatile boolean keepjumpFlag = false;
+    
+    
+    public static long QUICKTIMEGAP = 350;
+    public volatile boolean quickFlag = false;
+    
 
     public KeyListener keyAction(){
         if (keyListener != null){
             return keyListener;
         }
         keyListener =  new KeyListener() {
+            public long lsatClickTime = 0L;
+            
             @Override// 当按下并释放键时调用
             public void keyTyped(KeyEvent e) {}
             @Override// 当释放键时调用
             public void keyReleased(KeyEvent e) {
-                System.out.println(1);
                 int keyCode = e.getKeyCode();
                 if (keyCode == RIGHT_KEY){
                     keepRightMoveFlag = false;
@@ -102,8 +91,15 @@ public class Master extends JPanel {
             }
             @Override// 当按下键时调用
             public void keyPressed(KeyEvent e) {
-                System.out.println(2);
                 int keyCode = e.getKeyCode();
+                if (keyCode == RIGHT_KEY || keyCode == LEFT_KEY){
+                    if (System.currentTimeMillis() - lsatClickTime <= QUICKTIMEGAP){
+                        quickFlag = true;
+                    }else{
+                        quickFlag = false;
+                    }
+                    lsatClickTime = System.currentTimeMillis();
+                }
                 if (keyCode == RIGHT_KEY){
                     keepRightMoveFlag = true;
                     keepLeftMoveFlag = false;
@@ -127,8 +123,8 @@ public class Master extends JPanel {
             return;
         }
         jumpFlag = true;
-        resetJumpFlag();
         jumpTransfer();
+        resetJumpFlag();
     }
 
     public ExecutorService resetJumpExecutor = Executors.newSingleThreadExecutor();
@@ -153,15 +149,17 @@ public class Master extends JPanel {
             try {
                 int step = 5;
                 for (int i = 0; i < step; i++) {
-                    this.setLocationY(this.getY() - getDistance((step - i)));
+                    this.setLocationY(y - getDistance((step - i)));
                     this.repaint();
                     Thread.sleep(jumpStep/2/step);
                 }
                 for (int i = 0; i < step; i++) {
-                    this.setLocationY(this.getY() + getDistance((i + 1)));
+                    this.setLocationY(y + getDistance((i + 1)));
                     this.repaint();
                     Thread.sleep(jumpStep/2/step);
                 }
+                jumpMoveEnd();
+                
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -174,8 +172,8 @@ public class Master extends JPanel {
             return;
         }
         moveFlag = true;
-        resetMoveFlag(ngative);
         moveTransfer(ngative);
+        resetMoveFlag(ngative);
     }
 
 
@@ -199,15 +197,18 @@ public class Master extends JPanel {
     public void moveTransfer(boolean ngative){
         moveTransferExecutor.submit(()->{
             try {
-                int target = ngative ? -30 : 30;
+                int target = (ngative?-1:1) *(quickFlag?60:30);
                 int step = 10;
                 for (int i = 0; i < step; i++) {
                     if (!(ngative?keepLeftMoveFlag:keepRightMoveFlag)){
                         break;
                     }
-                    this.setLocationX(Math.max((this.getX()+(target/step)),0));
+                    this.setLocationX(x+(target/step));
                     this.repaint();
                     Thread.sleep(moveStep/step);
+                }
+                if (!jumpFlag) {
+                    jumpMoveEnd();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -222,12 +223,12 @@ public class Master extends JPanel {
         jumpTransferExecutor.submit(()->{
             try {
                 for (int i = 0; i < 4; i++) {
-                    this.setLocationY(this.getY() - getDistance((3 - i)));
+                    this.setLocationY(y - getDistance((3 - i)));
                     this.repaint();
                     Thread.sleep(100);
                 }
                 for (int i = 0; i < 10; i++) {
-                    this.setLocationY(this.getY() + getDistance((i + 1)));
+                    this.setLocationY(y + getDistance((i + 1)));
                     this.repaint();
                     Thread.sleep(40);
                 }
@@ -249,4 +250,22 @@ public class Master extends JPanel {
     public static int getDistance(int time){
         return time*time*2;
     }
+    
+    void jumpMoveEnd(){
+        if (regions==null||regions.size()==0){
+            return;
+        }
+        boolean aliveFlag = false;
+        for (int i = 0; i < regions.size(); i++) {
+            Region region = regions.get(i);
+            if (x > region.getStartX()-WIDTH && x < region.getEndX()){
+                aliveFlag = true;
+                break;
+            }
+        }
+        if (!aliveFlag){
+            die();
+        }
+    }
+    
 }
