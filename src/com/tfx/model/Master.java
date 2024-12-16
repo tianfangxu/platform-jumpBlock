@@ -10,20 +10,25 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.tfx.Setting.JUMP_KEY;
+import static com.tfx.Setting.LEFT_KEY;
+import static com.tfx.Setting.RIGHT_KEY;
+
 /**
  * @author tianfx
  * @date 2024/12/4 09:56
  */
 public class Master extends JPanel {
     
-    public static int LEFT_KEY = 37;
-    public static int RIGHT_KEY = 39;
-    public static int JUMP_KEY = 38;
-    
     public static int WIDTH = 30;
     public static int HEIGHT = 30;
     
 
+    ExecutorService moveTransferExecutor = Executors.newSingleThreadExecutor();
+    ExecutorService resetMoveExecutor = Executors.newSingleThreadExecutor();
+    ExecutorService jumpTransferExecutor = Executors.newSingleThreadExecutor();
+    ExecutorService resetJumpExecutor = Executors.newSingleThreadExecutor();
+    Thread dorpTaskThread;
     volatile int x;
     volatile int y;
     KeyListener keyListener;
@@ -45,12 +50,29 @@ public class Master extends JPanel {
         master.dieNoticeHandle = handle;
         master.setLocation(x,y);
         master.setSize(WIDTH,HEIGHT);
+        master.dorpTask();
         return master;
     }
 
-    public void setLocationX(int x) {
-        x = Math.max(x, 0);
-        this.x = x;
+    public void setLocationX(int moveX) {
+        moveX = Math.max(moveX, 0);
+
+        Region ground = null;
+        for (Region region : regions) {
+            if (x >= region.getStartX() && x <= region.getEndX()){
+                ground = region;
+            }
+        }
+        if (ground == null){
+            die();
+            return;
+        }
+        if (moveX < x && moveX < ground.getStartX() && ground.getPre() != null && ground.getPre().getHeightY() < y){
+            moveX = ground.getStartX();
+        }else if (moveX > x && moveX+WIDTH > ground.getEndX() && ground.getNext() != null && ground.getNext().getHeightY() < y){
+            moveX = ground.getEndX()-WIDTH;
+        }
+        this.x = moveX;
         super.setLocation(x, y);
         
     }
@@ -127,8 +149,7 @@ public class Master extends JPanel {
         resetJumpFlag();
     }
 
-    public ExecutorService resetJumpExecutor = Executors.newSingleThreadExecutor();
-    int jumpStep = 600;
+    int jumpStep = 300;
     public void resetJumpFlag(){
         resetJumpExecutor.submit(()->{
             try {
@@ -142,8 +163,7 @@ public class Master extends JPanel {
             }
         });
     }
-
-    public ExecutorService jumpTransferExecutor = Executors.newSingleThreadExecutor();
+    
     private void jumpTransfer() {
         jumpTransferExecutor.submit(()->{
             try {
@@ -151,15 +171,8 @@ public class Master extends JPanel {
                 for (int i = 0; i < step; i++) {
                     this.setLocationY(y - getDistance((step - i)));
                     this.repaint();
-                    Thread.sleep(jumpStep/2/step);
+                    Thread.sleep(jumpStep/step);
                 }
-                for (int i = 0; i < step; i++) {
-                    this.setLocationY(y + getDistance((i + 1)));
-                    this.repaint();
-                    Thread.sleep(jumpStep/2/step);
-                }
-                jumpMoveEnd();
-                
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -177,7 +190,6 @@ public class Master extends JPanel {
     }
 
 
-    public ExecutorService resetMoveExecutor = Executors.newSingleThreadExecutor();
     int moveStep = 350;
     public void resetMoveFlag(boolean ngative){
         resetMoveExecutor.submit(()->{
@@ -193,7 +205,6 @@ public class Master extends JPanel {
         });
     }
 
-    public ExecutorService moveTransferExecutor = Executors.newSingleThreadExecutor();
     public void moveTransfer(boolean ngative){
         moveTransferExecutor.submit(()->{
             try {
@@ -206,9 +217,6 @@ public class Master extends JPanel {
                     this.setLocationX(x+(target/step));
                     this.repaint();
                     Thread.sleep(moveStep/step);
-                }
-                if (!jumpFlag) {
-                    jumpMoveEnd();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -242,30 +250,68 @@ public class Master extends JPanel {
                 e.printStackTrace();
             }
         });
+        moveTransferExecutor.shutdown();
+        resetMoveExecutor.shutdown();
+        jumpTransferExecutor.shutdown();
+        resetJumpExecutor.shutdown();
+        dropFlag = true;
+    }
+
+
+
+    int dropCount = 10;
+    volatile boolean dropFlag = false;
+    public void dorpTask(){
+        dorpTaskThread = new Thread(() -> {
+            try {
+                int c = 0;
+                while (true) {
+                    if (dropFlag){
+                        break;
+                    }
+                    if (c == dropCount) {
+                        die();
+                        break;
+                    }
+                    if (jumpFlag || regions==null) {
+                        c = 0;
+                        continue;
+                    }
+                    Region ground = null;
+                    for (Region region : regions) {
+                        if (x >= region.getStartX() && x <= region.getEndX()){
+                            ground = region;
+                        }
+                    }
+                    if (ground == null){
+                        die();
+                        break;
+                    }
+                    if ((y+HEIGHT) == ground.getHeightY()){
+                        c = 0;
+                    }else if ((y+HEIGHT) > ground.getHeightY()){
+                        die();
+                        break;
+                    }else{
+                        this.setLocationY(Math.min(y + getDistance((c + 1)),ground.getHeightY() - HEIGHT));
+                        this.repaint();
+                        Thread.sleep(60);
+                        c++;
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        });
+        dorpTaskThread.start();
     }
 
     /**
      * jump Distance
      */
     public static int getDistance(int time){
-        return time*time*2;
-    }
-    
-    void jumpMoveEnd(){
-        if (regions==null||regions.size()==0){
-            return;
-        }
-        boolean aliveFlag = false;
-        for (int i = 0; i < regions.size(); i++) {
-            Region region = regions.get(i);
-            if (x > region.getStartX()-WIDTH && x < region.getEndX()){
-                aliveFlag = true;
-                break;
-            }
-        }
-        if (!aliveFlag){
-            die();
-        }
+        return Math.min(time*time*2,50);
     }
     
 }

@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.tfx.jumpBlock</id>
   <name>jumpBlock</name>
-  <version>1.02</version>
+  <version>1.03</version>
   <vendor email="tianfx1128@gmail.com" url="tianfx1128@gmail.com">jumpBlock</vendor>
 
   <description><![CDATA[
@@ -14,6 +14,7 @@
       v1.0 Created a block that can move forward and backward, as well as jump.<br>
       v1.01 Increase regional boundaries and methods of death, restart.<br>
       v1.02 increase the area that requires jumping. <br>
+      v1.03 Add Key Binding Function. <br>
     ]]>
   </change-notes>
 

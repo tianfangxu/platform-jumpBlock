@@ -24,23 +24,51 @@ public class Levels1 implements MapperManage {
     
     @Override
     public List<Region> intiArea() {
-        areas.add(Region.getStartRegion(300));
+        areas.add(Region.getStartRegion(200,"reg-start"));
         areas.add(getRegion1());
         areas.add(getRegion2());
+        areas.add(getRegion3());
+        areas.add(getRegion4());
+        initLinkedList();
         return areas;
     }
     
+    public void initLinkedList(){
+        for (int i = 0; i < areas.size(); i++) {
+            if (i-1 > -1){
+                areas.get(i).setPre(areas.get(i-1));
+            }
+            if (i+1 < areas.size()){
+                areas.get(i).setNext(areas.get(i+1));
+            }
+        }
+    }
+    
     public Region getRegion1(){
-        Region instance = Region.getInstance();
-        instance.setLocation(360,Subject.START_LOCAL[1]+Master.HEIGHT);
-        instance.setSize(300);
+        Region instance = Region.getInstance("reg-1");
+        instance.setLocation(201,Subject.START_LOCAL[1]+Master.HEIGHT+60);
+        instance.setSize(199);
         return instance;
     }
 
     public Region getRegion2(){
-        Region instance = Region.getInstance();
-        instance.setLocation(780,Subject.START_LOCAL[1]+Master.HEIGHT);
-        instance.setSize(300);
+        Region instance = Region.getInstance("reg-2");
+        instance.setLocation(401,Subject.START_LOCAL[1]+Master.HEIGHT);
+        instance.setSize(199);
+        return instance;
+    }
+
+    public Region getRegion3(){
+        Region instance = Region.getInstance("reg-3");
+        instance.setLocation(601,(Subject.START_LOCAL[1]+Master.HEIGHT+500));
+        instance.setSize(199);
+        return instance;
+    }
+
+    public Region getRegion4(){
+        Region instance = Region.getInstance("reg-3");
+        instance.setLocation(801,(Subject.START_LOCAL[1]+Master.HEIGHT+30));
+        instance.setSize(199);
         return instance;
     }
 }

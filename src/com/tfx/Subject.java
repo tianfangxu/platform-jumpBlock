@@ -56,4 +56,18 @@ public class Subject implements DieNoticeHandle {
         this.map.addKeyListener(master.keyAction());
         master.setRegions(regions);
     }
+
+
+
+    public static void main(String[] args) {
+        JFrame jf = new JFrame("jumpBlock");
+        jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        JComponent project = Subject.getInstance().getProject(JBColor.BLACK);
+        project.setBackground(JBColor.DARK_GRAY);
+        jf.setBackground(JBColor.DARK_GRAY);
+        jf.setContentPane(project);
+        jf.pack();
+        jf.setLocationRelativeTo(null);
+        jf.setVisible(true);
+    }
 }

@@ -1,0 +1,120 @@
+package com.tfx.common;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author tianfx
+ * @date 2024/12/16 14:32
+ */
+public class KeyMap {
+    
+    public static Map<Integer,String> keyMap = new HashMap<>(); 
+    static {
+        keyMap.put(8,"Backspace键");
+        keyMap.put(9,"Tab键");
+        keyMap.put(12,"Clear键 Num Lock关闭时的数字键盘5");
+        keyMap.put(13,"Enter键");
+        keyMap.put(16,"Shift键");
+        keyMap.put(17,"Ctrl键");
+        keyMap.put(18,"Alt键");
+        keyMap.put(19,"Pause键");
+        keyMap.put(20,"Caps Lock键");
+        keyMap.put(27,"Esc键");
+        keyMap.put(32,"Spacebar键");
+        keyMap.put(33,"Page Up键");
+        keyMap.put(34,"Page Down键");
+        keyMap.put(35,"End键");
+        keyMap.put(36,"Home键");
+        keyMap.put(37,"LEFT ARROW键");
+        keyMap.put(38,"UP ARROW键");
+        keyMap.put(39,"RIGHT ARROW键");
+        keyMap.put(40,"DOWN ARROW键");
+        keyMap.put(41,"Select键");
+        keyMap.put(42,"Print键");
+        keyMap.put(43,"Execute键");
+        keyMap.put(45,"Insert键 Num Lock关闭时的数字键盘0");
+        keyMap.put(46,"Delete键 Num Lock关闭时的数字键盘.");
+        keyMap.put(47,"Help键");
+        keyMap.put(48,"0键");
+        keyMap.put(49,"1键");
+        keyMap.put(50,"2键");
+        keyMap.put(51,"3键");
+        keyMap.put(52,"4键");
+        keyMap.put(53,"5键");
+        keyMap.put(54,"6键");
+        keyMap.put(55,"7键");
+        keyMap.put(56,"8键");
+        keyMap.put(57,"9键");
+        keyMap.put(65,"A键");
+        keyMap.put(66,"B键");
+        keyMap.put(67,"C键");
+        keyMap.put(68,"D键");
+        keyMap.put(69,"E键");
+        keyMap.put(70,"F键");
+        keyMap.put(71,"G键");
+        keyMap.put(72,"H键");
+        keyMap.put(73,"I键");
+        keyMap.put(74,"J键");
+        keyMap.put(75,"K键");
+        keyMap.put(76,"L键");
+        keyMap.put(77,"M键");
+        keyMap.put(78,"N键");
+        keyMap.put(79,"O键");
+        keyMap.put(80,"P键");
+        keyMap.put(81,"Q键");
+        keyMap.put(82,"R键");
+        keyMap.put(83,"S键");
+        keyMap.put(84,"T键");
+        keyMap.put(85,"U键");
+        keyMap.put(86,"V键");
+        keyMap.put(87,"W键");
+        keyMap.put(88,"X键");
+        keyMap.put(89,"Y键");
+        keyMap.put(90,"Z键");
+        keyMap.put(96,"数字键0键");
+        keyMap.put(97,"数字键1键");
+        keyMap.put(98,"数字键2键");
+        keyMap.put(99,"数字键3键");
+        keyMap.put(100,"数字键4键");
+        keyMap.put(101,"数字键5键");
+        keyMap.put(102,"数字键6键");
+        keyMap.put(103,"数字键7键");
+        keyMap.put(104,"数字键8键");
+        keyMap.put(105,"数字键9键");
+        keyMap.put(106,"数字键盘上的*键");
+        keyMap.put(107,"数字键盘上的+键");
+        keyMap.put(108,"Separator键");
+        keyMap.put(109,"数字键盘上的-键");
+        keyMap.put(110,"数字键盘上的.键");
+        keyMap.put(111,"数字键盘上的/键");
+        keyMap.put(112,"F1键");
+        keyMap.put(113,"F2键");
+        keyMap.put(114,"F3键");
+        keyMap.put(115,"F4键");
+        keyMap.put(116,"F5键");
+        keyMap.put(117,"F6键");
+        keyMap.put(118,"F7键");
+        keyMap.put(119,"F8键");
+        keyMap.put(120,"F9键");
+        keyMap.put(121,"F10键");
+        keyMap.put(122,"F11键");
+        keyMap.put(123,"F12键");
+        keyMap.put(144,"Num Lock键");
+        keyMap.put(145,"Scroll Lock键");
+        keyMap.put(91,"左win键");
+        keyMap.put(92,"右win键");
+        keyMap.put(93,"右Ctrl左边键 相当于鼠标右键");
+        keyMap.put(186,";（分号）键");
+        keyMap.put(187,"=键");
+        keyMap.put(188,",（逗号）键");
+        keyMap.put(189,"-（减号）键");
+        keyMap.put(190,".（句号）键");
+        keyMap.put(191,"/键");
+        keyMap.put(192,"`键（Esc下面）");
+        keyMap.put(219,"[键");
+        keyMap.put(220,"键");
+        keyMap.put(221,"]键");
+        keyMap.put(222,"‘（引号）键");
+    }
+}
